@@ -25,7 +25,7 @@ function getLatLong(city) {
     .then((res) => res.json())
     .then((data) => {
       if (!data.data) {
-        return "19.0760,72.8777";
+        return null;
       }
       const lat = data.data[0]?.latitude;
       const long = data.data[0]?.longitude;
@@ -33,7 +33,7 @@ function getLatLong(city) {
     })
     .catch((err) => {
       console.log("err", err);
-      return "19.0760,72.8777";
+      return null;
     });
 }
 
@@ -44,6 +44,9 @@ async function getRouteDetails(origin, destination, mode) {
   console.log("origin", origin, " destination ", destination, " mode ", mode);
   const orignLatLong = await getLatLong(origin);
   const destinationLatLong = await getLatLong(destination);
+  if(!orignLatLong || !destinationLatLong){
+    return null;
+  }
   console.log(orignLatLong, destinationLatLong);
   const url = `https://router.hereapi.com/v8/routes?transportMode=${mode}&origin=${orignLatLong}&destination=${destinationLatLong}&return=summary&apikey=${HERE_API_KEY}`;
   console.log(url);
@@ -135,7 +138,7 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
   let mode = agent.parameters["mode"] ?? "car";
   agent.add("doing heavy maths...");
   const data = await getRouteDetails(origin, destination, mode);
-  if (!data.routes) {
+  if (!data || !data.routes) {
     agent.add("Not valid route");
     return;
   }
