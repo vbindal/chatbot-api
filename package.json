@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "actions-on-google": "^2.13.0",
+    "actions-on-google": "^3.0.0",
     "dialogflow-fulfillment": "^0.6.1",
     "express": "^4.17.1",
     "geonames.js": "^3.0.6",
