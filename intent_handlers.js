@@ -83,6 +83,19 @@ function getDesc(q) {
     });
 }
 
+function secondsToHms(d) {
+  d = Number(d);
+  var h = Math.floor(d / 3600);
+  var m = Math.floor((d % 3600) / 60);
+  var s = Math.floor((d % 3600) % 60);
+
+  var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+  var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+  var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+  return hDisplay + mDisplay + sDisplay;
+}
+
+
 const placesToVisitInCity = {
   Mumbai: {
     desc: " Mumbai",
@@ -114,7 +127,6 @@ module.exports.handleWhereToVisit = function handleWhereToVisit(agent) {
     agent.add(new Suggestion(city));
   }
 };
-
 module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
   // get route details
   console.log("route details intent is working");
@@ -127,10 +139,10 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
     agent.add("Not valid route");
     return;
   }
-  const distance = data.routes[0].sections[0].summary.distance;
+  const distance = data.routes[0].sections[0].summary.length;
   const duration = data.routes[0].sections[0].summary.duration;
   agent.add(
-    `The distance between ${origin} and ${destination} is ${distance} and the duration is ${duration}`
+    `The distance between ${origin} and ${destination} is ${distance/1000}Km and the duration is ${secondsToHms(duration)}s`
   );
 };
 
