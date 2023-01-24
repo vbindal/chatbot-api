@@ -31,16 +31,33 @@ app.post("/webhook", (req, res) => {
   intentMap.set("Goodbye", handleGoodBye);
   intentMap.set("CurrentWeather", handleCurrentWeather);
   intentMap.set("HistoryIndia", handleHistoryIndia);
+  intentMap.set("RouteDetails", handleRouteDetails);
+  intentMap.set("whereTovisit", handleWhereToVisit);
+  intentMap.set("whereTovisit-loc", handleWhereToVisitLoc);
+  
 
   // now agent is handle request and pass intent map
   agent.handleRequest(intentMap);
 });
 
 // helper function
-
-function getRouteDetails(origin,destination,mode) {
-  const url = `https://router.hereapi.com/v8/routes?transportMode=${mode}&origin=${origin}&destination=${destination}&return=summary&apikey=W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA`;
-
+function getLatLong(city) {
+  // get origin lat and long
+  const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/locations/${city}/nearbyCities?limit=1&radius=100`;
+  return fetch(url, options)
+    .then((res) => res.json())
+    .then((data) => {
+      const lat = data.data[0].latitude;
+      const long = data.data[0].longitude;
+      return `${lat},${long}`;
+    });
+}
+async function getRouteDetails(origin, destination, mode) {
+  // get origin lat and long
+  const orignLatLong = await getLatLong(origin);
+  const destinationLatLong = await getLatLong(destination);
+  const url = `https://router.hereapi.com/v8/routes?transportMode=${mode}&origin=${orignLatLong}&destination=${destinationLatLong}&return=summary&apikey=W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA`;
+  return fetch(url).then((res) => res.json());
 }
 function getQueryImage(q) {
   // any image on the page
@@ -76,26 +93,72 @@ function getDesc(q) {
     });
 }
 
-// Intent handling
-
-async function handleHistoryIndia(agent) {
-    // give details about indian history
-    console.log("history intent is working");
-    agent.add(
-      new Card(
-        {
-          title: "History of India",
-          imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Rock_Shelter_15%2C_Bhimbetka_02.jpg/432px-Rock_Shelter_15%2C_Bhimbetka_02.jpg",
-          text: "The history of India dates back to the Indus Valley Civilization of the 3rd millennium BCE. Over the centuries, various empires and dynasties, including the Maurya, Gupta, Mughal, and British, have ruled the land. India gained independence from British colonial rule in 1947, and became a republic in 1950. Throughout its history, India has been a melting pot of various cultures and religions, which have shaped its art, architecture, literature, and philosophy. The country has also been shaped by a number of significant events, including the Indian independence movement, the partition of British India, and the ongoing conflict in Kashmir. Today, India is the world's second-most populous country and one of the fastest-growing major economies.",
-          buttonText: "Show History wiki",
-          buttonUrl: "https://en.wikipedia.org/wiki/History_of_India"
-        }
-
-      )
-    )
-    
+const placesToVisitInCity = {
+  Mumbai: {
+    desc: " Mumbai"
+  },
+  Delhi: {
+    desc: "Delhi",
+  },
+  Chennai: {
+    desc: "chen "
+  },
+  Agra: {
+    desc: "agra"
+  },
 }
 
+// Intent handling
+function handleWhereToVisitLoc(agent) {
+  console.log("WhereToVisitLoc intent is working");
+  const city = agent.parameters["geo-city"];
+  // rich response for telegram
+  agent.add("Here are some places to visit in " + city);
+}
+
+
+function handleWhereToVisit(agent) {
+  console.log("WhereToVisit intent is working");
+  agent.add(
+    "Where do you want to visit?"
+  )
+  // agent.add(new Suggestion('Mumbai'));
+  // agent.add(new Suggestion('Delhi'));
+  // agent.add(new Suggestion('Chennai'));
+  // agent.add(new Suggestion('Agra'));
+  for (let city in placesToVisitInCity) {
+      agent.add(new Suggestion(city));
+  }
+}
+
+async function handleRouteDetails(agent) {
+  // get route details
+  console.log("route details intent is working");
+  let origin = agent.parameters["geo-city-1"];
+  let destination = agent.parameters["geo-city-2"];
+  let mode = agent.parameters["mode"];
+  const data = await getRouteDetails(origin, destination, mode);
+  const distance = data.routes[0].sections[0].summary.distance;
+  const duration = data.routes[0].sections[0].summary.duration;
+  agent.add(
+    `The distance between ${origin} and ${destination} is ${distance} and the duration is ${duration}`
+  );
+}
+
+async function handleHistoryIndia(agent) {
+  // give details about indian history
+  console.log("history intent is working");
+  agent.add(
+    new Card({
+      title: "History of India",
+      imageUrl:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Rock_Shelter_15%2C_Bhimbetka_02.jpg/432px-Rock_Shelter_15%2C_Bhimbetka_02.jpg",
+      text: "The history of India dates back to the Indus Valley Civilization of the 3rd millennium BCE. Over the centuries, various empires and dynasties, including the Maurya, Gupta, Mughal, and British, have ruled the land. India gained independence from British colonial rule in 1947, and became a republic in 1950. Throughout its history, India has been a melting pot of various cultures and religions, which have shaped its art, architecture, literature, and philosophy. The country has also been shaped by a number of significant events, including the Indian independence movement, the partition of British India, and the ongoing conflict in Kashmir. Today, India is the world's second-most populous country and one of the fastest-growing major economies.",
+      buttonText: "Show History wiki",
+      buttonUrl: "https://en.wikipedia.org/wiki/History_of_India",
+    })
+  );
+}
 
 async function handleCurrentWeather(agent) {
   console.log("current weather intent is working");
