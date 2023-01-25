@@ -114,7 +114,7 @@ module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
       text: cityInfo.desc,
       buttonText: "Visit",
       buttonUrl: cityInfo.url,
-      
+
     })
   );
 };
@@ -184,7 +184,7 @@ module.exports.handleCityInfo = async function handleCityInfo(agent) {
   const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=IN&namePrefix=${city}`;
   const cityDetails = await fetch(url, options).then((res) => res.json());
   const desc = await getDesc(city);
-  const formatDetails = `${desc}
+  const formatDetails = `${desc.substring(0, 200)}...
   It is located in ${cityDetails.data[0].region} region of ${cityDetails.data[0].country} country with population of ${cityDetails.data[0].population} people .`;
   const imageUrl = await getQueryImage(city);
   agent.add(
