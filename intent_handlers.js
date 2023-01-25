@@ -103,6 +103,7 @@ module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
   console.log("WhereToVisitLoc intent is working");
   const city = agent.parameters["geo-city"];
   const cityInfo = CityInfo[city];
+  console.log("here city for visit loc ",city);
   if (!cityInfo) {
     agent.add("Sorry, I don't know about this city");
     return;

@@ -68,7 +68,7 @@ module.exports.CityInfo = {
         },
         
     ],
-    'Bangalore': [
+    'Bengaluru': [
         
         {
             title: "Bangalore Palace",
@@ -115,13 +115,7 @@ module.exports.CityInfo = {
             img: "https://upload.wikimedia.org/wikipedia/commons/c/c9/I%27tim%C4%81d-ud-Daulah%2C_Agra.jpg",
             desc: "The Itimad-ud-Daula's Tomb is situated on the left bank of river Jamuna next to Chini-ka-Rauza. Itimad-ud-Daula was the title given to Mirza Ghiyath Beg, father of Nur Jahan. He held the post of Lord of treasure of the empire and later rose to the dignity of wazir under Jahangir. Nur Jahan completed the construction of the building of the Tomb of her father in 1628 AD, nearly 7 years after his death. The tomb is located at the centre of a quadrangle with gardens laid out on the Char Bagh pattern surrounding it. The structure stands over a raised sandstone terrace measuring 149 feet square and 3 feet and 4 inches high from the ground. The tomb building consists of a central hall, which houses the tomb of Wazir and his wife. Small chambers in which the tombs of other family members are located surround this hall. A sandstone staircase leads to the first floor, where elegant oblong dome is found surmounting a pavilion over the central hall, topped with pinnacles. This pavilion also contains cenotaphs of plain marble but without any inscriptions. At the corners of the top of the building stand four round towers approximately measuring 40 feet in height, which are surmounted by marble kiosks.",
             url: 'https://en.wikipedia.org/wiki/Tomb_of_I%27tim%C4%81d-ud-Daulah'
-        },
-        {
-            title: "",
-            img: "",
-            desc: "",
-            url: ''
-        },
+        }
         
     ],
     'Chennai': [
