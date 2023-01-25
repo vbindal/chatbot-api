@@ -107,16 +107,18 @@ module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
     agent.add("Sorry, I don't know about this city");
     return;
   }
-  agent.add(
-    new Card({
-      title: city,
-      imageUrl: cityInfo.img,
-      text: cityInfo.desc,
-      buttonText: "Visit",
-      buttonUrl: cityInfo.url,
-
-    })
-  );
+  for (const place of cityInfo) {
+    agent.add(
+      new Card({
+        title: place.title,
+        imageUrl: place.img,
+        text: place.desc,
+        buttonText: "Visit",
+        buttonUrl: place.url,
+  
+      })
+    );
+  }
 };
 
 module.exports.handleWhereToVisit = function handleWhereToVisit(agent) {
