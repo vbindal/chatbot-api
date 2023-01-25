@@ -9,7 +9,7 @@ const API_KEY = "3d726b9fa0msh5d8fd5e5319380fp1be7c9jsncd62fc614da6";
 const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
 const HERE_API_KEY = 'W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA';
 const POSITION_STACK_API_KEY = '3b88eac52336361f8a98c3419085ff31';
-
+const {CityInfo} = require('./data');
 const options = { 
   method: "GET",
   headers: {
@@ -97,34 +97,32 @@ function secondsToHms(d) {
 }
 
 
-const placesToVisitInCity = {
-  Mumbai: {
-    desc: " Mumbai",
-  },
-  Delhi: {
-    desc: "Delhi",
-  },
-  Chennai: {
-    desc: "chen ",
-  },
-  Agra: {
-    desc: "agra",
-  },
-};
-
 // Intent handling - webhook functions
 
 module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
   console.log("WhereToVisitLoc intent is working");
   const city = agent.parameters["geo-city"];
-  // rich response for telegram
-  agent.add("Here are some places to visit in " + city);
+  const cityInfo = CityInfo[city];
+  if (!cityInfo) {
+    agent.add("Sorry, I don't know about this city");
+    return;
+  }
+  agent.add(
+    new Card({
+      title: city,
+      imageUrl: cityInfo.img,
+      text: cityInfo.desc,
+      buttonText: "Visit",
+      buttonUrl: cityInfo.url,
+      
+    })
+  );
 };
 
 module.exports.handleWhereToVisit = function handleWhereToVisit(agent) {
   console.log("WhereToVisit intent is working");
   agent.add("Where do you want to visit?");
-  for (let city in placesToVisitInCity) {
+  for (let city in CityInfo) {
     agent.add(new Suggestion(city));
   }
 };
