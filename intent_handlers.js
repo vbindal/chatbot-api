@@ -12,17 +12,17 @@ const client = new MongoClient(uri);
 
 const API_KEY = "3d726b9fa0msh5d8fd5e5319380fp1be7c9jsncd62fc614da6";
 const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
-const HERE_API_KEY = 'W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA';
-const POSITION_STACK_API_KEY = '3b88eac52336361f8a98c3419085ff31';
-const {CityInfo} = require('./data');
-const options = { 
+const HERE_API_KEY = "W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA";
+const POSITION_STACK_API_KEY = "3b88eac52336361f8a98c3419085ff31";
+const { CityInfo } = require("./data");
+const options = {
   method: "GET",
   headers: {
     "X-RapidAPI-Key": API_KEY,
     "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
   },
 };
-const db = client.db('amusingbot');
+const db = client.db("amusingbot");
 
 // helper function - get city image
 async function getStateFromCity(city) {
@@ -38,28 +38,25 @@ async function getStateFromCity(city) {
 }
 
 async function getLatLong(city) {
-    // get origin lat and long
-    const url = `http://api.positionstack.com/v1/forward?access_key=${POSITION_STACK_API_KEY}&query=${city}`;
-    console.log(url);
-    return fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.data && data.data.length > 0) {
-          return `${data.data[0].latitude},${data.data[0].longitude}`;
-        }
-        return null;
+  // get origin lat and long
+  const url = `http://api.positionstack.com/v1/forward?access_key=${POSITION_STACK_API_KEY}&query=${city}`;
+  console.log(url);
+  return fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.data && data.data.length > 0) {
+        return `${data.data[0].latitude},${data.data[0].longitude}`;
       }
-      );
-
+      return null;
+    });
 }
-
 
 async function getRouteDetails(origin, destination, mode) {
   // get origin lat and long
   console.log("origin", origin, " destination ", destination, " mode ", mode);
   const orignLatLong = await getLatLong(origin);
   const destinationLatLong = await getLatLong(destination);
-  if(!orignLatLong || !destinationLatLong){
+  if (!orignLatLong || !destinationLatLong) {
     return null;
   }
   console.log(orignLatLong, destinationLatLong);
@@ -90,7 +87,7 @@ function getDesc(q) {
   return fetch(url)
     .then((res) => res.json())
     .then((data) => {
-      if(!data || !data.query || data.query.pages["-1"]){
+      if (!data || !data.query || data.query.pages["-1"]) {
         return "No description found";
       }
       const pageId = Object.keys(data.query.pages)[0];
@@ -116,30 +113,31 @@ function secondsToHms(d) {
   return hDisplay + mDisplay + sDisplay;
 }
 async function getStateFoods(state) {
-  const foods = db.collection('foods');
+  const foods = db.collection("foods");
   // use regex to match state
-  const query = { 
-    state: { $regex: new RegExp(state, "i") }
+  const query = {
+    state: { $regex: new RegExp(state, "i") },
   };
   return foods.find(query).toArray();
 }
 // getStateFoods('rajasthan').then((res)=>console.log(res));
 // Intent handling - webhook functions
 module.exports.handleFamousFood = async function handleFamousFood(agent) {
-  console.log("handle famous food intent called");  
+  console.log("handle famous food intent called");
   const state = agent.parameters["geo-state"];
-    if(!state){
-        agent.add(`Sorry, I don't know about this state`);
-        return;
-    }
-    const foods = await getStateFoods(state);
-    if(!foods || foods.length === 0){
-        agent.add(`Sorry, I don't know about this state`);
-        return;
-    }
-    for(const food of foods){
-      const formatDetails = 
-      `
+  if (!state) {
+    agent.add(`Sorry, I don't know about this state`);
+    return;
+  }
+  const foods = await getStateFoods(state);
+  if (!foods || foods.length === 0) {
+    agent.add(`Sorry, I don't know about this state`);
+    return;
+  }
+  let cnt = 0;
+  
+  for (const food of foods) {
+    const formatDetails = `
       Ingredients: ${food.ingredients}
       Preparation Time: ${food.prep_time}
       Cooking Time: ${food.cook_time}
@@ -148,20 +146,25 @@ module.exports.handleFamousFood = async function handleFamousFood(agent) {
       region: ${food.region}
       `;
     const img = await getQueryImage(food.name);
-        agent.add(
-            new Card({
-                title: food.name,
-                imageUrl: img,
-                text: formatDetails,
-            })
-        );
+    if(!img) {continue}
+    cnt++;
+    if (cnt == 4) {
+      break;
     }
-}
+    agent.add(
+      new Card({
+        title: food.name,
+        imageUrl: img,
+        text: formatDetails,
+      })
+    );
+  }
+};
 module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
   console.log("WhereToVisitLoc intent is working");
   const city = agent.parameters["geo-city"];
   const cityInfo = CityInfo[city];
-  console.log("here city for visit loc ",city);
+  console.log("here city for visit loc ", city);
   if (!cityInfo) {
     agent.add("Sorry, I don't know about this city");
     return;
@@ -174,7 +177,6 @@ module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
         text: place.desc,
         buttonText: "Visit",
         buttonUrl: place.url,
-  
       })
     );
   }
@@ -201,7 +203,9 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
   const distance = data.routes[0].sections[0].summary.length;
   const duration = data.routes[0].sections[0].summary.duration;
   agent.add(
-    `The distance between ${origin} and ${destination} is ${distance/1000}Km and the duration is ${secondsToHms(duration)}s`
+    `The distance between ${origin} and ${destination} is ${
+      distance / 1000
+    }Km and the duration is ${secondsToHms(duration)}s`
   );
 };
 
@@ -242,7 +246,7 @@ module.exports.handleCurrentWeather = async function handleCurrentWeather(
 module.exports.handleCityInfo = async function handleCityInfo(agent) {
   console.log("city info intent is working");
   let city = agent.parameters["geo-city"] || agent.parameters["geo-state"];
-  if(!city){
+  if (!city) {
     agent.add("Please provide city/state name");
     return;
   }
@@ -251,7 +255,9 @@ module.exports.handleCityInfo = async function handleCityInfo(agent) {
   const cityDetails = await fetch(url, options).then((res) => res.json());
   const desc = await getDesc(city);
   const formatDetails = `${desc.substring(0, 200)}...
-  It is located in ${cityDetails.data[0].region} region of ${cityDetails.data[0].country} country with population of ${cityDetails.data[0].population} people .`;
+  It is located in ${cityDetails.data[0].region} region of ${
+    cityDetails.data[0].country
+  } country with population of ${cityDetails.data[0].population} people .`;
   const imageUrl = await getQueryImage(city);
   agent.add(
     new Card({
