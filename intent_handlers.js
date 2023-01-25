@@ -10,7 +10,7 @@ const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
 const HERE_API_KEY = 'W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA';
 const POSITION_STACK_API_KEY = '3b88eac52336361f8a98c3419085ff31';
 
-const options = {
+const options = { 
   method: "GET",
   headers: {
     "X-RapidAPI-Key": API_KEY,
@@ -182,7 +182,7 @@ module.exports.handleCurrentWeather = async function handleCurrentWeather(
 
 module.exports.handleCityInfo = async function handleCityInfo(agent) {
   console.log("city info intent is working");
-  let city = await agent.parameters["geo-city"];
+  let city = agent.parameters["geo-city"] ?? agent.parameters["geo-state"];
   const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=IN&namePrefix=${city}`;
   const cityDetails = await fetch(url, options).then((res) => res.json());
   const desc = await getDesc(city);
