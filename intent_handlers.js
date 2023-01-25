@@ -282,6 +282,15 @@ module.exports.handleDefaultIntent = function handleDefaultIntent(agent) {
       text: "How can I help you?",
     })
   );
+  const suggests = [
+     'best places in india','best foods in india',
+     'best foods/dishes of different states india','culture of india',
+     'info about different states in india','weather of different places in india',
+     'distance between two places'
+  ]
+  for (const sugg of suggests) {
+    agent.add(new Suggestion(sugg));
+  }
 };
 module.exports.handleGoodBye = function handleGoodBye(agent) {
   console.log("good bye intent is working");
