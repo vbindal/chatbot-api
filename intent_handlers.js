@@ -146,7 +146,7 @@ module.exports.handleFamousFood = async function handleFamousFood(agent) {
       region: ${food.region}
       `;
     const img = await getQueryImage(food.name);
-    if(!img) {continue}
+    if(img===defaultImage) {continue}
     cnt++;
     if (cnt == 4) {
       break;
