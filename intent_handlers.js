@@ -278,16 +278,15 @@ module.exports.handleDefaultIntent = function handleDefaultIntent(agent) {
     })
   );
   agent.add(
-    new Text({
-      text: "How can I help you?",
-    })
+    `How can I help you?some suggested questions you can ask from me :
+    best places in india,best foods in india,
+    best foods/dishes of different states india,culture of india,
+    info about different states in india,weather of different places in india,
+    distance between two places`
   );
-  const suggests = [
-     'best places in india','best foods in india',
-     'best foods/dishes of different states india','culture of india',
-     'info about different states in india','weather of different places in india',
-     'distance between two places'
-  ]
+  
+     
+  
   for (const sugg of suggests) {
     agent.add(new Suggestion(sugg));
   }
