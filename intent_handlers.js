@@ -5,6 +5,11 @@ const {
   Text,
   Suggestion,
 } = require("dialogflow-fulfillment");
+const { MongoClient } = require("mongodb");
+const uri = "mongodb+srv://shubh:eZ9n3bAxQ9dz0pzd@cluster0.8yaor.mongodb.net";
+const client = new MongoClient(uri);
+// Replace the uri string with your connection string.
+
 const API_KEY = "3d726b9fa0msh5d8fd5e5319380fp1be7c9jsncd62fc614da6";
 const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
 const HERE_API_KEY = 'W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA';
@@ -17,8 +22,20 @@ const options = {
     "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
   },
 };
+const db = client.db('amusingbot');
 
 // helper function - get city image
+async function getStateFromCity(city) {
+  const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities/${city}`;
+  return fetch(url, options)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.data && data.data.length > 0) {
+        return data.data[0].regionCode;
+      }
+      return null;
+    });
+}
 
 async function getLatLong(city) {
     // get origin lat and long
@@ -73,6 +90,9 @@ function getDesc(q) {
   return fetch(url)
     .then((res) => res.json())
     .then((data) => {
+      if(!data || !data.query || data.query.pages["-1"]){
+        return "No description found";
+      }
       const pageId = Object.keys(data.query.pages)[0];
       let desc = "";
       if (data.query.pages[pageId].extract) {
@@ -95,10 +115,48 @@ function secondsToHms(d) {
   var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
   return hDisplay + mDisplay + sDisplay;
 }
-
-
+async function getStateFoods(state) {
+  const foods = db.collection('foods');
+  // use regex to match state
+  const query = { 
+    state: { $regex: new RegExp(state, "i") }
+  };
+  return foods.find(query).toArray();
+}
+// getStateFoods('rajasthan').then((res)=>console.log(res));
 // Intent handling - webhook functions
-
+module.exports.handleFamousFood = async function handleFamousFood(agent) {
+  console.log("handle famous food intent called");  
+  const state = agent.parameters["geo-state"];
+    if(!state){
+        agent.add(`Sorry, I don't know about this state`);
+        return;
+    }
+    const foods = await getStateFoods(state);
+    if(!foods || foods.length === 0){
+        agent.add(`Sorry, I don't know about this state`);
+        return;
+    }
+    for(const food of foods){
+      const formatDetails = 
+      `
+      Ingredients: ${food.ingredients}
+      Preparation Time: ${food.prep_time}
+      Cooking Time: ${food.cook_time}
+      Course: ${food.course}
+      State: ${food.state}
+      region: ${food.region}
+      `;
+    const img = await getQueryImage(food.name);
+        agent.add(
+            new Card({
+                title: food.name,
+                imageUrl: img,
+                text: formatDetails,
+            })
+        );
+    }
+}
 module.exports.handleWhereToVisitLoc = function handleWhereToVisitLoc(agent) {
   console.log("WhereToVisitLoc intent is working");
   const city = agent.parameters["geo-city"];
@@ -183,7 +241,12 @@ module.exports.handleCurrentWeather = async function handleCurrentWeather(
 
 module.exports.handleCityInfo = async function handleCityInfo(agent) {
   console.log("city info intent is working");
-  let city = agent.parameters["geo-city"] ?? agent.parameters["geo-state"];
+  let city = agent.parameters["geo-city"] || agent.parameters["geo-state"];
+  if(!city){
+    agent.add("Please provide city/state name");
+    return;
+  }
+  console.log("city info intent is working with ", city);
   const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=IN&namePrefix=${city}`;
   const cityDetails = await fetch(url, options).then((res) => res.json());
   const desc = await getDesc(city);

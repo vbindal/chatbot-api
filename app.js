@@ -10,6 +10,7 @@ const {handleCityInfo,
   handleRouteDetails,
   handleWhereToVisit,
   handleWhereToVisitLoc,
+  handleFamousFood
 } = require("./intent_handlers");
 const app = express();
 
@@ -32,6 +33,7 @@ app.post("/webhook", (req, res) => {
   intentMap.set("RouteDetails", handleRouteDetails);
   intentMap.set("whereTovisit", handleWhereToVisit);
   intentMap.set("whereTovisit-loc", handleWhereToVisitLoc);
+  intentMap.set("famousFood", handleFamousFood);
   // now agent is handle request and pass intent map
   agent.handleRequest(intentMap);
 });
