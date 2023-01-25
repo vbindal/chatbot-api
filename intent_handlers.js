@@ -8,6 +8,8 @@ const {
 const API_KEY = "3d726b9fa0msh5d8fd5e5319380fp1be7c9jsncd62fc614da6";
 const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
 const HERE_API_KEY = 'W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA';
+const POSITION_STACK_API_KEY = '3b88eac52336361f8a98c3419085ff31';
+
 const options = {
   method: "GET",
   headers: {
@@ -18,26 +20,22 @@ const options = {
 
 // helper function - get city image
 
-function getLatLong(city) {
-  // get origin lat and long
-  const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${city}&limit=1`;
-  return fetch(url, options)
-    .then((res) => res.json())
-    .then((data) => {
-      if (!data.data) {
+async function getLatLong(city) {
+    // get origin lat and long
+    const url = `http://api.positionstack.com/v1/forward?access_key=${POSITION_STACK_API_KEY}&query=${city}`;
+    console.log(url);
+    return fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.data && data.data.length > 0) {
+          return `${data.data[0].latitude},${data.data[0].longitude}`;
+        }
         return null;
       }
-      const lat = data.data[0]?.latitude;
-      const long = data.data[0]?.longitude;
-      return `${lat},${long}`;
-    })
-    .catch((err) => {
-      console.log("err", err);
-      return null;
-    });
+      );
+
 }
 
-// console.log("latlong of mumbai", getLatLong("mumbai"));
 
 async function getRouteDetails(origin, destination, mode) {
   // get origin lat and long
@@ -136,7 +134,6 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
   let origin = agent.parameters["from-geo"];
   let destination = agent.parameters["to-geo"];
   let mode = agent.parameters["mode"] ?? "car";
-  agent.add("doing heavy maths...");
   const data = await getRouteDetails(origin, destination, mode);
   if (!data || !data.routes) {
     agent.add("Not valid route");
