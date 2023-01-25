@@ -14,6 +14,7 @@ const API_KEY = "3d726b9fa0msh5d8fd5e5319380fp1be7c9jsncd62fc614da6";
 const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
 const HERE_API_KEY = "W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA";
 const POSITION_STACK_API_KEY = "3b88eac52336361f8a98c3419085ff31";
+const defaultImage = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1200px-No-Image-Placeholder.svg.png";
 const { CityInfo } = require("./data");
 const options = {
   method: "GET",
@@ -75,8 +76,7 @@ function getQueryImage(q) {
       if (data.query.pages[pageId].thumbnail) {
         imageUrl = data.query.pages[pageId].thumbnail.source;
       } else {
-        imageUrl =
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1200px-No-Image-Placeholder.svg.png";
+        imageUrl = defaultImage;
       }
       return imageUrl;
     });
@@ -146,7 +146,7 @@ module.exports.handleFamousFood = async function handleFamousFood(agent) {
       region: ${food.region}
       `;
     const img = await getQueryImage(food.name);
-    if(!img) {continue}
+    if(img===defaultImage) {continue}
     cnt++;
     if (cnt == 4) {
       break;
