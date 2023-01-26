@@ -141,3 +141,88 @@ module.exports.CityInfo = {
     ]
 
 }
+
+module.exports.HotelInfo  = {
+
+    'Mumbai': [
+        
+        {
+            name: "Goldfinch Hotel Mumbai",
+            contact: "+91 98863 04690",
+            address: "21 Central Road MIDC, Andheri, Mumbai 400093 India",
+            url: 'https://www.goldfinchhotels.com/goldfinch-mumbai/',
+            image:'https://r1imghtlak.mmtcdn.com/d6b682b8fb3011eba82a0a58a9feac02.jpg?&output-quality=75&downsize=910:612&crop=910:612;4,0&output-format=jpg&downsize=821:550&crop=821:550',
+            description : `Take a dip in the property's swimming pool and refresh yourself.
+            Reach the hotel easily from Andheri Railway Station which is only 3.6 km away.
+            Pamper yourself with a variety of wellness therapies and massages at the in-house spa and steam room.
+            Relish lip-smacking Indian, Chinese and Mediterranean fare at the in-house restaurant, Banjara.`
+        },
+        {
+            name: "The Lalit Mumbai",
+            contact: "91-22-66992222",
+            address: "The LaLiT Mumbai Sahar Airport Road, Mumbai - 400059 India",
+            url: 'https://www.thelalit.com/the-lalit-mumbai/',
+            image:'https://pix8.agoda.net/hotelImages/43879/0/604250d16d9ebba5902f136c3075603b.jpg?ca=7&ce=1&s=1024x768',
+            description : `Things you'll love
+            470 meters to public transportation
+            Airport transfer
+            Located in heart of Mumbai
+            Free Wi-Fi in all rooms!`
+        },
+        {
+            name: "Sahara Star Hotel",
+            contact: "022 39895000",
+            address: "Opp Domestic Airport Mumbai 400099",
+            url: 'https://www.saharastar.com/',
+            image:'https://pix8.agoda.net/hotelImages/70697/-1/7e5ee69ac5a9ba9ed8fc247cb866470c.jpg?ca=0&ce=1&s=1024x768',
+            description: 
+            "The car parking and the Wi-Fi are always free, so you can stay in touch and come and go as you please. Conveniently situated in the Vile Parle part of Mumbai, this property puts you close to attractions and interesting dining options. Don't leave before paying a visit to the famous Gateway of India. Rated with 5 stars, this high-quality property provides guests with access to massage, restaurant and fitness center on-site."
+        } 
+        
+    ],
+    'Delhi': [
+        {
+            name: "ibis New Delhi Aerocity - An Accor Brand",
+            contact: "+91 11 4302 0202",
+            address: "ibis New Delhi Aerocity, Delhi Aerocity - IGI Airport, IGI Airport",
+            url: 'https://all.accor.com/hotel/7484/index.en.shtml?utm_term=mar&utm_campaign=ppc-ibi-mar-goo-in-en-dom_top-mix-se&utm_medium=cpc&utm_content=in-en-IN-V5418&utm_source=google',
+            image: 'https://www.ahstatic.com/photos/7484_ho_00_p_1024x768.jpg',
+            description: "The hotel is located next to India's busiest international airport. The Airport Express metro line is just walking distance from the hotel, leading you to VFS Visa Centre in 20min. Centrally located, the hotel is connected by NH8 linking it to Cyber City, Cyber Hub, and Ambience Mall. The hotel is next to Worldmark and is located close to Delhi's shopping malls - DLF Promenade and Emporio, Select Citywalk in Saket, and hospitals like Indian Spinal Injuries Centre Hospital and Fortis"
+        }
+    ],
+    'Bengaluru': [
+        {
+            name: "Bloom Hotel - Bengaluru Airport",
+            contact: " 011 4122 5666",
+            address: "Down Town Park, Sadahalli Gate, Kempegowda Int'l Airport Rd, 562157 Bangalore, India",
+            url: 'https://staybloom.com/hotels/bengaluru?utm_source=Google&utm_medium=cpc&utm_campaign=brand-bengaluru&couponCode=BLOOM15',
+            image : 'https://staybloom.com/content/1655976908676-47.jpg',
+            description : "Bloom Hotel - Brookefield is located in Bengaluru's IT hub and is just one-hour drive from the airport. The hotel has a unique design and concept that makes the guest’s experience memorable and enjoyable. With two floors and 88 rooms, this property offers two room categories: Standard Queen, and Standard Twin.Whether you are business or leisure traveller, Bloom hotel, near Brookefield Bangalore has everything you need."
+        }
+        
+    ],
+    'Agra': [
+        {
+            name: "Khas Mahal Homestay",
+            contact: "9358563617",
+            address: "179/180, Groud Floor, Parshvnath Panchvati, Opp ADA Heights, Fatehabad Toad ,Taj Nagari Phase 2, 282002 Agra, India",
+            url: 'https://www.khasmahalhomestay.com/',
+            image: 'https://pix8.agoda.net/hotelImages/226/2264803/2264803_17091112090056208275.jpg?ca=6&ce=1&s=1024x768',
+            description : "The car parking and the Wi-Fi are always free, so you can stay in touch and come and go as you please. Conveniently situated in the Cantonment part of Agra, this property puts you close to attractions and interesting dining options. Don't leave before paying a visit to the famous Taj Mahal. This 5-star property features restaurant to make your stay more indulgent and memorable"
+        },
+        
+        
+    ],
+    'Chennai': [
+        {
+            name: "Citadines OMR Chennai",
+            contact: "044 7111 7111",
+            address: "290, Rajiv Gandhi Salai (OMR), Sholinganallur, Sholinganallur, 600119 Chennai, India",
+            url: 'https://www.makemytrip.com/hotels/citadines_omrchennai-details-chennai.html',
+            image: 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/89367373.jpg?k=c0494c2920fd8fbf53c98434ea9096ca79e320ad0d12a06835b4134f1b968b88&o=&hp=1',
+            description : "Situated in Chennai, Citadines OMR Chennai features a fitness centre and a garden. Popular points of interest around the property include Indian Institute of Technology, Madras and Anna University. Guests can sample European and international dishes at the on-site restaurant"
+        },
+        
+    ]
+
+}

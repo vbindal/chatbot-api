@@ -17,7 +17,7 @@ const HERE_API_KEY = "W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA";
 const POSITION_STACK_API_KEY = "3b88eac52336361f8a98c3419085ff31";
 const defaultImage =
   "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1200px-No-Image-Placeholder.svg.png";
-const { CityInfo } = require("./data");
+const { CityInfo, HotelInfo } = require("./data");
 const options = {
   method: "GET",
   headers: {
@@ -124,6 +124,70 @@ async function getStateFoods(state) {
 }
 // getStateFoods('rajasthan').then((res)=>console.log(res));
 // Intent handling - webhook functions
+
+module.exports.handleCityVisit = async function handleCityVisit(agent) {
+  console.log("hanleCityVisit called");
+  const city = agent.parameters["geo-city"];
+	console.log("city", city);
+	//  share location with user
+	//  https://maps.google.com/?q=<lat>,<lng>
+  const latLong = await getLatLong(city);
+	console.log("latLong", latLong);
+	const payload = {
+		"telegram": {
+			"text": "Follow the link to see the location of the city",
+			"reply_markup": {
+				"inline_keyboard": [
+					[
+						{
+							"text": "Location",
+							"url": `https://maps.google.com/?q=${latLong}`
+						}
+					]
+				]
+			}
+		}
+	}
+	agent.add(new Payload(agent.TELEGRAM, payload, { rawPayload: true, sendAsMessage: true }));
+};
+
+module.exports.handleHotelInfo = async function handleHotelInfo(agent) {
+  console.log("handle hotel info intent called");
+  const city = agent.parameters["geo-city"];
+  if (!city) {
+    for (const city of Object.keys(HotelInfo)) {
+      agent.add(new Suggestion(city));
+    }
+    return;
+  }
+  console.log("hotel working with city ", city);
+  let cnt = 0;
+  const hotelInfo = HotelInfo[city];
+  if (!hotelInfo) {
+    agent.add(`Sorry, I don't know about hotels in this ${city}`);
+    return;
+  }
+  for (const hotel of hotelInfo) {
+    cnt++;
+    agent.add(
+      new Card({
+        title: hotel.name,
+        imageUrl: hotel.image,
+        text: `
+				${hotel.description}
+				Contact: ${hotel.contact}
+				Address: ${hotel.address}
+				`,
+        buttonText: "Book Now",
+        buttonUrl: hotel.url,
+      })
+    );
+  }
+  if (cnt === 0) {
+    agent.add(`Sorry, I don't know about this city`);
+  }
+};
+
 module.exports.handleFamousFood = async function handleFamousFood(agent) {
   console.log("handle famous food intent called");
   const state = agent.parameters["geo-state"];
@@ -140,13 +204,13 @@ module.exports.handleFamousFood = async function handleFamousFood(agent) {
 
   for (const food of foods) {
     const formatDetails = `
-      Ingredients: ${food.ingredients} 
-      Preparation Time: ${food.prep_time} minutes
-      Cooking Time: ${food.cook_time} minutes
-      Course: ${food.course} 
-      State: ${food.state}
-      region: ${food.region}
-      `;
+			Ingredients: ${food.ingredients} 
+			Preparation Time: ${food.prep_time} minutes
+			Cooking Time: ${food.cook_time} minutes
+			Course: ${food.course} 
+			State: ${food.state}
+			region: ${food.region}
+			`;
     const img = await getQueryImage(food.name);
     // if (img === defaultImage) {
     //   continue;
@@ -210,8 +274,8 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
     `The distance between ${origin} and ${destination} is ${
       distance / 1000
     }Km and the duration is ${secondsToHms(duration)}s
-      by ${mode}
-    `
+			by ${mode}
+		`
   );
 };
 
@@ -243,9 +307,9 @@ module.exports.handleCurrentWeather = async function handleCurrentWeather(
     return;
   }
   const formatData = `
-      According to weather api, it is ${data.current.condition.text} in ${city} with temperature of ${data.current.temp_c} degree celsius.
-      
-    `;
+			According to weather api, it is ${data.current.condition.text} in ${city} with temperature of ${data.current.temp_c} degree celsius.
+			
+		`;
   agent.add(formatData);
 };
 
@@ -261,7 +325,7 @@ module.exports.handleCityInfo = async function handleCityInfo(agent) {
   const cityDetails = await fetch(url, options).then((res) => res.json());
   const desc = await getDesc(city);
   const formatDetails = `${desc.substring(0, 200)}...
-  It is located in ${cityDetails.data[0].region} region of ${
+	It is located in ${cityDetails.data[0].region} region of ${
     cityDetails.data[0].country
   } country with population of ${cityDetails.data[0].population} people .`;
   const imageUrl = await getQueryImage(city);
@@ -313,7 +377,7 @@ module.exports.handleDefaultIntent = function handleDefaultIntent(agent) {
             {
               text: "Place Information",
               callback_data: "Info about",
-            }
+            },
           ],
           [
             {
@@ -323,17 +387,16 @@ module.exports.handleDefaultIntent = function handleDefaultIntent(agent) {
             {
               text: "Hotels",
               callback_data: "Hotels",
-            }
+            },
           ],
-          
+
           [
             {
               text: "Faqs",
               // link: https://drive.google.com/file/d/1ocCdUVs0Z-BN0zrZDhqc7AisDzk0MZBZ/view?usp=share_link
               url: "https://drive.google.com/file/d/1ocCdUVs0Z-BN0zrZDhqc7AisDzk0MZBZ/view?usp=sharing",
-            }
-          ]
-
+            },
+          ],
         ],
       },
     },
