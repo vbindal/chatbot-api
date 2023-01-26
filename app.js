@@ -34,6 +34,8 @@ app.post("/webhook", (req, res) => {
   intentMap.set("whereTovisit", handleWhereToVisit);
   intentMap.set("whereTovisit-loc", handleWhereToVisitLoc);
   intentMap.set("famousFood", handleFamousFood);
+  intentMap.set("FamousFood_state", handleFamousFood);
+
   // now agent is handle request and pass intent map
   agent.handleRequest(intentMap);
 });

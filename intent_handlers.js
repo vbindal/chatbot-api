@@ -4,6 +4,7 @@ const {
   Image,
   Text,
   Suggestion,
+  Payload,
 } = require("dialogflow-fulfillment");
 const { MongoClient } = require("mongodb");
 const uri = "mongodb+srv://shubh:eZ9n3bAxQ9dz0pzd@cluster0.8yaor.mongodb.net";
@@ -14,7 +15,8 @@ const API_KEY = "3d726b9fa0msh5d8fd5e5319380fp1be7c9jsncd62fc614da6";
 const WEATHER_API_KEY = "51441fed7c4c42288dc63014232201";
 const HERE_API_KEY = "W0LtOYvklDQE7DcthrtykD66xoSHg7-DPyGXtpgyQtA";
 const POSITION_STACK_API_KEY = "3b88eac52336361f8a98c3419085ff31";
-const defaultImage = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1200px-No-Image-Placeholder.svg.png";
+const defaultImage =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1200px-No-Image-Placeholder.svg.png";
 const { CityInfo } = require("./data");
 const options = {
   method: "GET",
@@ -126,7 +128,7 @@ module.exports.handleFamousFood = async function handleFamousFood(agent) {
   console.log("handle famous food intent called");
   const state = agent.parameters["geo-state"];
   if (!state) {
-    agent.add(`Sorry, I don't know about this state`);
+    agent.add(`Please provide a state for which you want to know about food`);
     return;
   }
   const foods = await getStateFoods(state);
@@ -135,18 +137,20 @@ module.exports.handleFamousFood = async function handleFamousFood(agent) {
     return;
   }
   let cnt = 0;
-  
+
   for (const food of foods) {
     const formatDetails = `
-      Ingredients: ${food.ingredients}
-      Preparation Time: ${food.prep_time}
-      Cooking Time: ${food.cook_time}
-      Course: ${food.course}
+      Ingredients: ${food.ingredients} 
+      Preparation Time: ${food.prep_time} minutes
+      Cooking Time: ${food.cook_time} minutes
+      Course: ${food.course} 
       State: ${food.state}
       region: ${food.region}
       `;
     const img = await getQueryImage(food.name);
-    if(img===defaultImage) {continue}
+    // if (img === defaultImage) {
+    //   continue;
+    // }
     cnt++;
     if (cnt == 4) {
       break;
@@ -205,7 +209,9 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
   agent.add(
     `The distance between ${origin} and ${destination} is ${
       distance / 1000
-    }Km and the duration is ${secondsToHms(duration)}s`
+    }Km and the duration is ${secondsToHms(duration)}s
+      by ${mode}
+    `
   );
 };
 
@@ -277,19 +283,67 @@ module.exports.handleDefaultIntent = function handleDefaultIntent(agent) {
       text: "Welcome to Amusing Bot",
     })
   );
+  // agent.add(
+  //   `How can I help you?some suggested questions you can ask from me :
+  //   best places in india,best foods in india,
+  //   best foods/dishes of different states india,culture of india,
+  //   info about different states in india,weather of different places in india,
+  //   distance between two places`
+  // );
+  const payload = {
+    telegram: {
+      text: "What can i do for you?",
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Suggest Places",
+              callback_data: "Suggest me places to visit",
+            },
+            {
+              text: "Suggest Foods",
+              callback_data: "famous food of state",
+            },
+          ],
+          [
+            {
+              text: "Current weather",
+              callback_data: "Current weather",
+            },
+            {
+              text: "Place Information",
+              callback_data: "Info about",
+            }
+          ],
+          [
+            {
+              text: "Route Details",
+              callback_data: "Distance between two places",
+            },
+            {
+              text: "Hotels",
+              callback_data: "Hotels",
+            }
+          ],
+          
+          [
+            {
+              text: "Faqs",
+              // link: https://drive.google.com/file/d/1ocCdUVs0Z-BN0zrZDhqc7AisDzk0MZBZ/view?usp=share_link
+              url: "https://drive.google.com/file/d/1ocCdUVs0Z-BN0zrZDhqc7AisDzk0MZBZ/view?usp=sharing",
+            }
+          ]
+
+        ],
+      },
+    },
+  };
   agent.add(
-    `How can I help you?some suggested questions you can ask from me :
-    best places in india,best foods in india,
-    best foods/dishes of different states india,culture of india,
-    info about different states in india,weather of different places in india,
-    distance between two places`
+    new Payload(agent.TELEGRAM, payload, {
+      sendAsMessage: true,
+      rawPayload: true,
+    })
   );
-  
-     
-  
-  for (const sugg of suggests) {
-    agent.add(new Suggestion(sugg));
-  }
 };
 module.exports.handleGoodBye = function handleGoodBye(agent) {
   console.log("good bye intent is working");
