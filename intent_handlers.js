@@ -127,7 +127,7 @@ async function getStateFoods(state) {
 
 module.exports.handleCityVisit = async function handleCityVisit(agent) {
   console.log("hanleCityVisit called");
-  const city = agent.parameters["geo-city"];
+  const city = agent.parameters["geo-city"] ?? agent.parameters["geo-state"];
 	console.log("city", city);
 	//  share location with user
 	//  https://maps.google.com/?q=<lat>,<lng>
@@ -135,7 +135,7 @@ module.exports.handleCityVisit = async function handleCityVisit(agent) {
 	console.log("latLong", latLong);
 	const payload = {
 		"telegram": {
-			"text": "Follow the link to see the location of the city",
+			"text": `Follow the link to see the location of the ${city}`,
 			"reply_markup": {
 				"inline_keyboard": [
 					[
@@ -273,8 +273,7 @@ module.exports.handleRouteDetails = async function handleRouteDetails(agent) {
   agent.add(
     `The distance between ${origin} and ${destination} is ${
       distance / 1000
-    }Km and the duration is ${secondsToHms(duration)}s
-			by ${mode}
+    }Km and the duration is ${secondsToHms(duration)} by ${mode}
 		`
   );
 };
